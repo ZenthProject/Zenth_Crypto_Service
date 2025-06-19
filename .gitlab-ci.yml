@@ -1,0 +1,23 @@
+stages:
+  - build
+
+rust-latest:
+  stage: build
+  image: rust:latest
+  tags:
+    - zenth_crypto_service_project_runner
+  script:
+    - apt-get update && apt-get install -y curl cmake gcc libclang.so
+    - cargo build --all --verbose
+    - cargo test
+
+rust-nightly:
+  stage: build
+  image: rustlang/rust:nightly
+  tags:
+    - zenth_crypto_service_project_runner
+  script:
+    - apt-get update && apt-get install -y curl cmake gcc libclang.so
+    - cargo build --all --verbose
+    - cargo test
+  allow_failure: true
