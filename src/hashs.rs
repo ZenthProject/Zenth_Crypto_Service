@@ -27,6 +27,7 @@ impl HashSecure for HasherImpl {
             let mut hasher = Sha3_512::new();
             hasher.update(&result);
             result = hasher.finalize().to_vec();
+            println!("SHA3-512 raw hash length: {} bytes", result.len()); // <- Ajoute ça
         }
         base64encode(&result)
     }
