@@ -1,13 +1,19 @@
 stages:
   - build
 
+variables:
+  DEBIAN_FRONTEND: "noninteractive"
+
+before_script:
+  - apt-get update
+  - apt-get install -y curl cmake gcc clang libclang-dev pkg-config libssl-dev
+
 rust-latest:
   stage: build
   image: rust:latest
   tags:
     - zenth_crypto_service_project_runner
   script:
-    - apt-get update && apt-get install -y curl cmake gcc libclang.so
     - cargo build --all --verbose
     - cargo test
 
@@ -17,7 +23,6 @@ rust-nightly:
   tags:
     - zenth_crypto_service_project_runner
   script:
-    - apt-get update && apt-get install -y curl cmake gcc libclang.so
     - cargo build --all --verbose
     - cargo test
   allow_failure: true

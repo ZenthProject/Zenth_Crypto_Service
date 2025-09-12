@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 //
 
-use zenth_crypto_service::aes_gcm::{Aes256GcmEncryption, Aes256GcmDecryption};
+use zenth_crypto_service::symetric::aes_gcm::{Aes256GcmEncryption, Aes256GcmDecryption};
 
 #[test]
 fn test_aes_gcm_encryption() {

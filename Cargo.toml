@@ -45,13 +45,23 @@ argon2 = "0.5.3"
 crc32fast = "1.4.2"
 rsa = "0.9.8"
 hex-literal = "1.0.0"
-rand_core = "0.6"
+rand_core = { version = "0.9.3", features = ["os_rng"]} 
 rand = "0.8"
-
-
-#sha1s = "0.10.6"
-#sha2s = "0.10.9"
+cbc = "0.1.2"
+twofish = "0.7.1"
+chacha20poly1305 = "0.10.1"
+pem = "3.0.5"
+libcrux-ml-kem = "0.0.3"
+x25519-dalek = { version = "2.0.1", features = ["static_secrets"] }
 
 boring-signal = { git = "https://github.com/signalapp/boring", tag = "signal-v4.15.0", package = "boring", default-features = false }
 curve25519-dalek-signal = { git = 'https://github.com/signalapp/curve25519-dalek', package = "curve25519-dalek", tag = 'signal-curve25519-4.1.3' }
 tokio-boring-signal = { git = "https://github.com/signalapp/boring", package = "tokio-boring", tag = "signal-v4.15.0" }
+log = "0.4.28"
+assert_matches = "1.5.0"
+hpke-rs-crypto = "0.3.0"
+hkdf = "0.12.4"
+rand_chacha = "0.9.0"
+zerocopy = "0.8.27"
+
+

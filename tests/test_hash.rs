@@ -1,158 +1,182 @@
-use zenth_crypto_service::hashs::{HasherImpl, HashSecure};
-use zenth_crypto_service::hash::*;
-use zenth_crypto_service::hashs;
-use zenth_crypto_service::hashs::base64encode;
-use zenth_crypto_service::hashs::*;
+use zenth_crypto_service::{
+    hashing::hash::CryptographicHash,
+    encoding::base64::{EncodeImpl, EncodeSecure},
+    kdf::argon2id::Argon2idHasher,
+};
+
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::HasherImpl;
+
+    #[test]
+    fn test_sha1() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("SHA-1", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
+        assert_ne!(hash_b64, EncodeImpl::base64encode(data));
+    }
+
+    #[test]
+    fn test_sha256() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("SHA-256", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
+        assert_ne!(hash_b64, EncodeImpl::base64encode(data));
+    }
 
     #[test]
     fn test_sha512() {
-        let data = "test";
-        let hash = HasherImpl::sha512_fun(data, 1);
-        assert!(!hash.is_empty());
-        assert_ne!(hash, hashs::base64encode(data.as_bytes()));
-    }
-
-    #[test]
-    fn test_keccak() {
-        let data = "test";
-        let hash = HasherImpl::keccak_fun(data, 1);
-        assert!(!hash.is_empty());
-        assert_ne!(hash, hashs::base64encode(data.as_bytes()));
-    }
-
-    #[test]
-    fn test_md5() {
-        let data = "test";
-        let hash = HasherImpl::md5_fun(data, 1);
-        assert!(!hash.is_empty());
-        assert_ne!(hash, hashs::base64encode(data.as_bytes()));
-    }
-
-    #[test]
-    fn test_crc() {
-        let data = "test";
-        let hash = HasherImpl::crc_fun(data, 1);
-        assert!(!hash.is_empty());
-        assert_ne!(hash, hashs::base64encode(data.as_bytes()));
-    }
-
-    #[test]
-    fn test_argon2id() {
-        let password = "test";
-        let hash = HasherImpl::argon2id_hash(password);
-        assert!(HasherImpl::argon2id_verify(password, &hash));
-    }
-
-    #[test]
-    fn test_sha512_basic() {
-        let hash1 = HasherImpl::sha512_fun("password", 1);
-        let hash2 = HasherImpl::sha512_fun("password", 1);
-        assert_eq!(hash1, hash2);
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("SHA-512", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
+        assert_ne!(hash_b64, EncodeImpl::base64encode(data));
     }
 
     #[test]
     fn test_sha512_multiple_rounds() {
-        let hash1 = HasherImpl::sha512_fun("data", 1);
-        let hash2 = HasherImpl::sha512_fun("data", 2);
+        let data = b"test";
+        let mut h1 = CryptographicHash::new("SHA-512", 1).unwrap();
+        let mut h2 = CryptographicHash::new("SHA-512", 3).unwrap();
+        h1.update(data);
+        h2.update(data);
+        let hash1 = EncodeImpl::base64encode(&h1.finalize());
+        let hash2 = EncodeImpl::base64encode(&h2.finalize());
         assert_ne!(hash1, hash2);
     }
 
     #[test]
-    fn test_sha512_zero_round() {
-        let hash = HasherImpl::sha512_fun("text", 0);
-        assert_eq!(hashs::base64encode("text".as_bytes()), hash);
+    fn test_sha3_512() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("SHA3-512", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
     }
 
     #[test]
-    fn test_keccak_consistency() {
-        let h1 = HasherImpl::keccak_fun("text", 3);
-        let h2 = HasherImpl::keccak_fun("text", 3);
-        assert_eq!(h1, h2);
+    fn test_keccak512() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("KECCAK512", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
     }
 
     #[test]
-    fn test_keccak_diff_input() {
-        let h1 = HasherImpl::keccak_fun("abc", 2);
-        let h2 = HasherImpl::keccak_fun("def", 2);
-        assert_ne!(h1, h2);
+    fn test_md5() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("MD5", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
     }
 
     #[test]
-    fn test_md5_repeatability() {
-        let h1 = HasherImpl::md5_fun("mydata", 5);
-        let h2 = HasherImpl::md5_fun("mydata", 5);
-        assert_eq!(h1, h2);
-    }
-
-    #[test]
-    fn test_md5_empty_string() {
-        let h = HasherImpl::md5_fun("", 1);
-        assert!(!h.is_empty());
-    }
-
-    #[test]
-    fn test_crc_variation() {
-        let h1 = HasherImpl::crc_fun("1234", 1);
-        let h2 = HasherImpl::crc_fun("1234", 2);
-        assert_ne!(h1, h2);
-    }
-
-    #[test]
-    fn test_crc_repeatability() {
-        let h1 = HasherImpl::crc_fun("constant", 10);
-        let h2 = HasherImpl::crc_fun("constant", 10);
-        assert_eq!(h1, h2);
-    }
-
-    #[test]
-    fn test_argon2id_invalid_password() {
-        let password = "correct";
-        let wrong = "wrong";
-        let hash = HasherImpl::argon2id_hash(password);
-        assert!(!HasherImpl::argon2id_verify(wrong, &hash));
-    }
-
-    #[test]
-    fn test_argon2id_invalid_hash_format() {
-        let password = "anything";
-        let bad_hash = "$argon2id$v=19$m=65536,t=2,p=1$INVALID";
-        assert!(!HasherImpl::argon2id_verify(password, bad_hash));
-    }
-
-    #[test]
-    fn test_argon2id_different_hashes() {
-        let h1 = HasherImpl::argon2id_hash("mypassword");
-        let h2 = HasherImpl::argon2id_hash("mypassword");
-        assert_ne!(h1, h2);
-    }
-
-    #[test]
-    fn test_all_hashes_on_same_input() {
-        let input = "ALL_HASHES";
-        let sha = HasherImpl::sha512_fun(input, 1);
-        let keccak = HasherImpl::keccak_fun(input, 1);
-        let md5 = HasherImpl::md5_fun(input, 1);
-        let crc = HasherImpl::crc_fun(input, 1);
-        assert_ne!(sha, keccak);
-        assert_ne!(keccak, md5);
-        assert_ne!(md5, crc);
+    fn test_crc32() {
+        let data = b"test";
+        let mut hasher = CryptographicHash::new("CRC32", 1).unwrap();
+        hasher.update(data);
+        let hash_bytes = hasher.finalize();
+        let hash_b64 = EncodeImpl::base64encode(&hash_bytes);
+        assert!(!hash_b64.is_empty());
     }
 
     #[test]
     fn test_unicode_input() {
-        let input = "🐍🚀🦀";
-        let sha = HasherImpl::sha512_fun(input, 1);
-        let keccak = HasherImpl::keccak_fun(input, 1);
-        let md5 = HasherImpl::md5_fun(input, 1);
-        let crc = HasherImpl::crc_fun(input, 1);
-        assert!(!sha.is_empty());
-        assert!(!keccak.is_empty());
-        assert!(!md5.is_empty());
-        assert!(!crc.is_empty());
+        let data = "🐍🚀🦀".as_bytes();
+        let mut sha = CryptographicHash::new("SHA-512", 1).unwrap();
+        let mut keccak = CryptographicHash::new("KECCAK512", 1).unwrap();
+        let mut md5 = CryptographicHash::new("MD5", 1).unwrap();
+        let mut crc = CryptographicHash::new("CRC32", 1).unwrap();
+        sha.update(data);
+        keccak.update(data);
+        md5.update(data);
+        crc.update(data);
+        assert!(!EncodeImpl::base64encode(&sha.finalize()).is_empty());
+        assert!(!EncodeImpl::base64encode(&keccak.finalize()).is_empty());
+        assert!(!EncodeImpl::base64encode(&md5.finalize()).is_empty());
+        assert!(!EncodeImpl::base64encode(&crc.finalize()).is_empty());
     }
+
+    #[test]
+    fn test_repeatability() {
+        let data = b"repeat";
+        let mut h1 = CryptographicHash::new("SHA-256", 2).unwrap();
+        let mut h2 = CryptographicHash::new("SHA-256", 2).unwrap();
+        h1.update(data);
+        h2.update(data);
+        let hash1 = h1.finalize();
+        let hash2 = h2.finalize();
+        assert_eq!(hash1, hash2);
+    }
+    
+    #[test]
+    fn test_valid_password_verification() {
+        let hasher = Argon2idHasher::new().expect("Failed to create hasher");
+        let password = "secure_password";
+
+        let hash = hasher.hash(password).expect("Hashing failed");
+        let is_valid = hasher.verify(password, &hash).expect("Verification failed");
+
+        assert!(is_valid, "Password should be valid");
+    }
+
+    #[test]
+    fn test_invalid_password_verification() {
+        let hasher = Argon2idHasher::new().expect("Failed to create hasher");
+        let password = "correct_password";
+        let wrong_password = "wrong_password";
+
+        let hash = hasher.hash(password).expect("Hashing failed");
+        let is_valid = hasher.verify(wrong_password, &hash).expect("Verification failed");
+
+        assert!(!is_valid, "Wrong password should not verify");
+    }
+
+    #[test]
+    fn test_invalid_hash_format() {
+        let hasher = Argon2idHasher::new().expect("Failed to create hasher");
+        let password = "any_password";
+        let bad_hash = "not-a-valid-hash";
+
+        let result = hasher.verify(password, bad_hash);
+        assert!(result.is_err(), "Invalid hash format should return error");
+    }
+
+
+    #[test]
+    fn test_different_hashes_for_same_password() {
+        let hasher = Argon2idHasher::new().expect("Failed to create hasher");
+        let password = "reused_password";
+
+        let hash1 = hasher.hash(password).expect("First hash failed");
+        let hash2 = hasher.hash(password).expect("Second hash failed");
+
+        assert_ne!(hash1, hash2, "Hashes should differ due to random salt");
+    }
+
+    #[test]
+    fn test_hash_with_client_salt() {
+        let hasher = Argon2idHasher::new().expect("Failed to create hasher");
+        let password = "client_salted";
+        let salt = "somesaltstring1234567890";
+
+        let hash = hasher.hash_with_client_salt(password, salt);
+        assert!(hash.is_ok(), "Hashing with client salt should succeed");
+    }
+
+
 }

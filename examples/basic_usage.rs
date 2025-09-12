@@ -1,8 +1,8 @@
 use zenth_crypto_service::{
-    aes_gcm::{Aes256GcmEncryption, Aes256GcmDecryption},
-    rsa4096::Rsa4096,
-    hashs::{HasherImpl, HashSecure},
-    hashs::base64encode,
+    symetric::aes_gcm::{Aes256GcmDecryption, Aes256GcmEncryption},
+    asymetric::rsa4096::Rsa4096,
+    hashing::hash::CryptographicHash,
+    encoding::base64::{EncodeImpl, EncodeSecure}
 };
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -17,8 +17,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     enc.encrypt(&mut buffer);
     let tag = enc.compute_tag();
     
-    println!("Encrypted: {}", base64encode(&buffer));
-    println!("Tag: {}", base64encode(&tag));
+    println!("Encrypted: {}", EncodeImpl::base64encode(&buffer));
+    println!("Tag: {}", EncodeImpl::base64encode(&tag));
     
     let mut dec = Aes256GcmDecryption::new(&key, &nonce, b"")?;
     dec.decrypt(&mut buffer);
@@ -39,9 +39,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Example 3: Hashing
     println!("\n=== Hashing Example ===");
-    let data = "Data to hash";
-    let sha256_hash = HasherImpl::sha512_fun(data, 1);
-    println!("SHA-256: {}", sha256_hash);
-    
+    let data = "Data to hash".as_bytes();
+    let mut sha256_hash = CryptographicHash::new("SHA-512", 1).unwrap();
+    sha256_hash.update(data);
+    println!("SHA-256: {:?}", EncodeImpl::base64encode(&sha256_hash.finalize()));
+
     Ok(())
 } 

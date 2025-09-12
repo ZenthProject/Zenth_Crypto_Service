@@ -1,7 +1,6 @@
 use zenth_crypto_service::{
-    serpent_ctr::{SerpentCtr32, Error},
+    symetric::serpent_ctr::{SerpentCtr32, Error},
 };
-use rand::rngs::OsRng;
 
 #[cfg(test)]
 mod tests {

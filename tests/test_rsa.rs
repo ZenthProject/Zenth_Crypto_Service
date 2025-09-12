@@ -1,6 +1,6 @@
 use zenth_crypto_service::{
-    rsa4096::Rsa4096,
-    hashs::base64encode,
+    asymetric::rsa4096::Rsa4096,
+    encoding::base64::{EncodeImpl, EncodeSecure},
 };
 
 #[cfg(test)]
@@ -45,9 +45,9 @@ mod tests {
 
         let msg = b"top secret";
         let encrypted = rsa1.encrypt(msg);
-        let encrypted_b64 = base64encode(encrypted.as_bytes()); // simulate public transmission
+        let encrypted_b64 = EncodeImpl::base64encode(encrypted.as_bytes());
 
-        let _ = rsa2.decrypt(&encrypted_b64); // <-- devrait paniquer
+        let _ = rsa2.decrypt(&encrypted_b64);
     }
 
 }

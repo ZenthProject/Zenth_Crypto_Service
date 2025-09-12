@@ -4,7 +4,7 @@
 //
 
 
-use zenth_crypto_service::aes_ctr::Aes256Ctr32;
+use zenth_crypto_service::symetric::aes_ctr::Aes256Ctr32;
 
 #[test]
 fn test_aes_ctr_encryption() {
