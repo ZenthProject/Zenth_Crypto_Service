@@ -2271,7 +2271,6 @@ dependencies = [
  "tokio-boring",
  "twofish",
  "x25519-dalek",
- "zerocopy",
  "zeroize",
 ]
 

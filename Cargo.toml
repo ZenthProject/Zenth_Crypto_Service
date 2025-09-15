@@ -62,6 +62,5 @@ assert_matches = "1.5.0"
 hpke-rs-crypto = "0.3.0"
 hkdf = "0.12.4"
 rand_chacha = "0.9.0"
-zerocopy = "0.8.27"
 
 
